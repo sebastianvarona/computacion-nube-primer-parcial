@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: microservices_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-service
+    ports:
+      - "5001:5001"
+    depends_on:
+      - microusers
+      - microproducts
+      - microorders
+    networks:
+      - microservices-network
+
+  microusers:
+    build:
+      context: ./microUsers
+      dockerfile: Dockerfile
+    container_name: microusers-service
+    ports:
+      - "5002:5002"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=microservices_db
+    networks:
+      - microservices-network
+
+  microproducts:
+    build:
+      context: ./microProducts
+      dockerfile: Dockerfile
+    container_name: microproducts-service
+    ports:
+      - "5003:5003"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=microservices_db
+    networks:
+      - microservices-network
+
+  microorders:
+    build:
+      context: ./microOrders
+      dockerfile: Dockerfile
+    container_name: microorders-service
+    ports:
+      - "5004:5004"
+    depends_on:
+      db:
+        condition: service_healthy
+      microproducts:
+        condition: service_started
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=microservices_db
+    networks:
+      - microservices-network
+
+volumes:
+  mysql_data:
+
+networks:
+  microservices-network:
+    driver: bridge

@@ -155,3 +155,8 @@ Thumbs.db
 *.bak
 *.backup
 *~.nib
+.local/
+.vim/
+.ssh/
+.cache/
+go/

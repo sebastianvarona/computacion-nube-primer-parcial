@@ -1,6 +1,6 @@
 
-CREATE DATABASE myflaskapp;
-use myflaskapp;
+CREATE DATABASE IF NOT EXISTS microservices_db;
+use microservices_db;
 
 CREATE TABLE users (
     id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -24,7 +24,8 @@ CREATE TABLE orders (
     date datetime default current_timestamp);
 
 
-INSERT INTO users VALUES(null, "juan", "juan@gmail.com", "juan", "123"),
+INSERT INTO users VALUES(null, "Admin User", "admin@example.com", "admin", "admin123"),
+    (null, "juan", "juan@gmail.com", "juan", "123"),
     (null, "maria", "maria@gmail.com", "maria", "456");
 
 INSERT INTO products VALUES(null, "pc", "150", "10"),

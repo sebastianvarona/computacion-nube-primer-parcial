@@ -3,84 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
+    <title>User Management - Mini Store</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         body {
-            padding-top: 50px;
-            padding-bottom: 20px;
+            padding-top: 70px;
+            background-color: #f8f9fa;
         }
-        .navbar {
-            margin-bottom: 20px;
+        .navbar-brand {
+            font-weight: bold;
         }
-        .form-container {
-            max-width: 500px;
-            margin: 0 auto;
+        .container {
+            max-width: 1200px;
         }
-        .user-list {
-            margin-top: 20px;
-            list-style-type: none;
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: 1px solid rgba(0, 0, 0, 0.125);
         }
-        .user-item {
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        .form-section {
+            background-color: #ffffff;
+            border-radius: 8px;
+            margin-bottom: 30px;
         }
-        .user-item a {
-            margin-right: 10px;
+        .table-responsive {
+            border-radius: 8px;
+        }
+        .btn-action {
+            margin-right: 5px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .alert {
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-    <a class="navbar-brand" href="/dashboard">Store Management</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+    <a class="navbar-brand" href="/dashboard">
+        <i class="fas fa-store"></i> Mini Store
+    </a>
+    
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
     </button>
+
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/users"><i class="fas fa-users"></i> Users</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/products"><i class="fas fa-box"></i> Products</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/orders"><i class="fas fa-shopping-cart"></i> Orders</a>
+            </li>
+        </ul>
+    </div>
 </nav>
 
-<div class="container">
-    <div class="form-container">
-        <h2>Add New User</h2>
-        <form id="add-user-form">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" class="form-control" id="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" required>
-            </div>
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" required>
-            </div>
-            <button type="button" onclick="createUser()">Create User</button>
-        </form>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4"><i class="fas fa-users"></i> User Management</h1>
+        </div>
+    </div>
+    
+    <div id="message"></div>
+
+    <!-- Add/Edit User Form -->
+    <div class="card form-section">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-plus"></i> <span id="form-title">Add New User</span></h5>
+        </div>
+        <div class="card-body">
+            <form id="userForm">
+                <input type="hidden" id="userId" name="userId">
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name"><i class="fas fa-user"></i> Full Name:</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email"><i class="fas fa-envelope"></i> Email:</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="username"><i class="fas fa-at"></i> Username:</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="password"><i class="fas fa-lock"></i> Password:</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> <span id="submit-text">Add User</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary ml-2" id="cancelBtn" onclick="cancelEdit()" style="display: none;">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <h2>Users List</h2>
-    <table id="user-list" class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Username</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <button type="button" onclick="getUsers()">Get Users</button>
+    <!-- Users List -->
+    <div class="card">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Users List</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="usersTable">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Name</th>
+                            <th><i class="fas fa-envelope"></i> Email</th>
+                            <th><i class="fas fa-at"></i> Username</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody">
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script src="static/scriptUsers.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const API_URL = 'http://192.168.80.3:5002/api/users';
+    let editingUserId = null;
+
+    // Load users on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUsers();
+    });
+
+    // Handle form submission
+    document.getElementById('userForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const userData = {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            username: formData.get('username'),
+            password: formData.get('password')
+        };
+
+        if (editingUserId) {
+            updateUser(editingUserId, userData);
+        } else {
+            createUser(userData);
+        }
+    });
+
+    // Load all users
+    function loadUsers() {
+        fetch(API_URL)
+            .then(response => response.json())
+            .then(data => {
+                displayUsers(data);
+            })
+            .catch(error => {
+                showMessage('Error loading users: ' + error.message, 'danger');
+            });
+    }
+
+    // Display users in table
+    function displayUsers(users) {
+        const tbody = document.getElementById('usersBody');
+        tbody.innerHTML = '';
+
+        users.forEach(user => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td><strong>#${user.id}</strong></td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td><code>${user.username}</code></td>
+                <td>
+                    <button class="btn btn-warning btn-sm btn-action" onclick="editUser(${user.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm btn-action" onclick="deleteUser(${user.id})">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </td>
+            `;
+        });
+    }
+
+    // Create new user
+    function createUser(userData) {
+        fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            showMessage('User created successfully!', 'success');
+            clearForm();
+            loadUsers();
+        })
+        .catch(error => {
+            showMessage('Error creating user: ' + error.message, 'danger');
+        });
+    }
+
+    // Edit user
+    function editUser(id) {
+        fetch(`${API_URL}/${id}`)
+            .then(response => response.json())
+            .then(user => {
+                document.getElementById('userId').value = user.id;
+                document.getElementById('name').value = user.name;
+                document.getElementById('email').value = user.email;
+                document.getElementById('username').value = user.username;
+                document.getElementById('password').value = ''; // Don't populate password for security
+                
+                editingUserId = id;
+                document.getElementById('form-title').textContent = 'Edit User';
+                document.getElementById('submit-text').textContent = 'Update User';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+            })
+            .catch(error => {
+                showMessage('Error loading user: ' + error.message, 'danger');
+            });
+    }
+
+    // Update user
+    function updateUser(id, userData) {
+        fetch(`${API_URL}/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            showMessage('User updated successfully!', 'success');
+            cancelEdit();
+            loadUsers();
+        })
+        .catch(error => {
+            showMessage('Error updating user: ' + error.message, 'danger');
+        });
+    }
+
+    // Delete user
+    function deleteUser(id) {
+        if (confirm('Are you sure you want to delete this user?')) {
+            fetch(`${API_URL}/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                showMessage('User deleted successfully!', 'success');
+                loadUsers();
+            })
+            .catch(error => {
+                showMessage('Error deleting user: ' + error.message, 'danger');
+            });
+        }
+    }
+
+    // Cancel edit
+    function cancelEdit() {
+        editingUserId = null;
+        clearForm();
+        document.getElementById('form-title').textContent = 'Add New User';
+        document.getElementById('submit-text').textContent = 'Add User';
+        document.getElementById('cancelBtn').style.display = 'none';
+    }
+
+    // Clear form
+    function clearForm() {
+        document.getElementById('userForm').reset();
+        document.getElementById('userId').value = '';
+    }
+
+    // Show messages
+    function showMessage(message, type) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                ${message}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        `;
+        
+        setTimeout(() => {
+            messageDiv.innerHTML = '';
+        }, 5000);
+    }
+</script>
+
 </body>
 </html>
 

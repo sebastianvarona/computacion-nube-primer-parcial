@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit User - Mini Store</title>
+    <title>Edit Order - Mini Store</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -59,9 +59,9 @@
     <div class="row">
         <div class="col-12">
             <h1 class="mb-4">
-                <i class="fas fa-user-edit"></i> Edit User
-                <a href="/users" class="btn btn-secondary float-right">
-                    <i class="fas fa-arrow-left"></i> Back to Users
+                <i class="fas fa-edit"></i> Edit Order
+                <a href="/orders" class="btn btn-secondary float-right">
+                    <i class="fas fa-arrow-left"></i> Back to Orders
                 </a>
             </h1>
         </div>
@@ -69,27 +69,27 @@
     
     <div id="message"></div>
 
-    <!-- Edit User Form -->
+    <!-- Edit Order Form -->
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="fas fa-user-edit"></i> Edit User Details</h5>
+            <h5 class="mb-0"><i class="fas fa-edit"></i> Edit Order Details</h5>
         </div>
         <div class="card-body">
-            <form id="editUserForm">
-                <input type="hidden" id="userId" name="userId" value="{{ id }}">
+            <form id="editOrderForm">
+                <input type="hidden" id="orderId" name="orderId" value="{{ id }}">
                 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="name"><i class="fas fa-user"></i> Full Name:</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                            <label for="userName"><i class="fas fa-user"></i> Customer Name:</label>
+                            <input type="text" class="form-control" id="userName" name="userName" required>
                         </div>
                     </div>
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="email"><i class="fas fa-envelope"></i> Email:</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
+                            <label for="userEmail"><i class="fas fa-envelope"></i> Customer Email:</label>
+                            <input type="email" class="form-control" id="userEmail" name="userEmail" required>
                         </div>
                     </div>
                 </div>
@@ -97,25 +97,24 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="username"><i class="fas fa-at"></i> Username:</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            <label for="saleTotal"><i class="fas fa-dollar-sign"></i> Sale Total:</label>
+                            <input type="number" class="form-control" id="saleTotal" name="saleTotal" step="0.01" min="0" required>
                         </div>
                     </div>
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="password"><i class="fas fa-lock"></i> New Password:</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
-                            <small class="form-text text-muted">Leave blank to keep current password</small>
+                            <label for="date"><i class="fas fa-calendar"></i> Date:</label>
+                            <input type="datetime-local" class="form-control" id="date" name="date">
                         </div>
                     </div>
                 </div>
                 
                 <div class="form-group text-center">
                     <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="fas fa-save"></i> Update User
+                        <i class="fas fa-save"></i> Update Order
                     </button>
-                    <a href="/users" class="btn btn-secondary btn-lg ml-3">
+                    <a href="/orders" class="btn btn-secondary btn-lg ml-3">
                         <i class="fas fa-times"></i> Cancel
                     </a>
                 </div>
@@ -128,62 +127,72 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    const API_URL = 'http://192.168.80.3:5002/api/users';
-    const userId = '{{ id }}';
+    const API_URL = 'http://192.168.80.3:5004/api/orders';
+    const orderId = '{{ id }}';
 
-    // Load user details on page load
+    // Load order details on page load
     document.addEventListener('DOMContentLoaded', function() {
-        loadUserDetails();
+        loadOrderDetails();
     });
 
     // Handle form submission
-    document.getElementById('editUserForm').addEventListener('submit', function(e) {
+    document.getElementById('editOrderForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const formData = new FormData(this);
-        const userData = {
-            name: formData.get('name'),
-            email: formData.get('email'),
-            username: formData.get('username'),
-            password: formData.get('password')
+        const orderData = {
+            userName: formData.get('userName'),
+            userEmail: formData.get('userEmail'),
+            saleTotal: parseFloat(formData.get('saleTotal'))
         };
 
-        updateUser(userId, userData);
+        // Include date if provided
+        if (formData.get('date')) {
+            orderData.date = formData.get('date');
+        }
+
+        updateOrder(orderId, orderData);
     });
 
-    // Load user details
-    function loadUserDetails() {
-        fetch(`${API_URL}/${userId}`)
+    // Load order details
+    function loadOrderDetails() {
+        fetch(`${API_URL}/${orderId}`)
             .then(response => response.json())
-            .then(user => {
-                document.getElementById('name').value = user.name;
-                document.getElementById('email').value = user.email;
-                document.getElementById('username').value = user.username;
-                // Don't populate password for security reasons
+            .then(order => {
+                document.getElementById('userName').value = order.userName || '';
+                document.getElementById('userEmail').value = order.userEmail || '';
+                document.getElementById('saleTotal').value = order.saleTotal || '';
+                
+                if (order.date) {
+                    const date = new Date(order.date);
+                    const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+                        .toISOString().slice(0, 16);
+                    document.getElementById('date').value = localDateTime;
+                }
             })
             .catch(error => {
-                showMessage('Error loading user details: ' + error.message, 'danger');
+                showMessage('Error loading order details: ' + error.message, 'danger');
             });
     }
 
-    // Update user
-    function updateUser(id, userData) {
+    // Update order
+    function updateOrder(id, orderData) {
         fetch(`${API_URL}/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify(orderData)
         })
         .then(response => response.json())
         .then(data => {
-            showMessage('User updated successfully!', 'success');
+            showMessage('Order updated successfully!', 'success');
             setTimeout(() => {
-                window.location.href = '/users';
+                window.location.href = '/orders';
             }, 1500);
         })
         .catch(error => {
-            showMessage('Error updating user: ' + error.message, 'danger');
+            showMessage('Error updating order: ' + error.message, 'danger');
         });
     }
 
@@ -204,4 +213,3 @@
 
 </body>
 </html>
-

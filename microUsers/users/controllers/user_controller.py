@@ -28,7 +28,12 @@ def create_user():
     print("creando usuario")
     data = request.json
     #new_user = Users(name="oscar", email="oscar@gmail", username="omondragon", password="123")
-    new_user = Users(name=data['name'], email=data['email'], username=data['username'], password=data['password'])
+    new_user = Users(
+        name=data.get('name', ''), 
+        email=data.get('email', ''), 
+        username=data.get('username', ''), 
+        password=data.get('password', '')
+    )
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': 'User created successfully'}), 201
@@ -39,10 +44,10 @@ def update_user(user_id):
     print("actualizando usuario")
     user = Users.query.get_or_404(user_id)
     data = request.json
-    user.name = data['name']
-    user.email = data['email']
-    user.username = data['username']
-    user.password = data['password']
+    user.name = data.get('name', user.name)
+    user.email = data.get('email', user.email)
+    user.username = data.get('username', user.username)
+    user.password = data.get('password', user.password)
     db.session.commit()
     return jsonify({'message': 'User updated successfully'})
 
