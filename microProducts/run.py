@@ -3,6 +3,8 @@ from db.db import db
 from products.models.product_model import Products
 import time
 import sys
+import os
+from shared.consul_utils import register_service_with_consul
 
 def create_tables_with_retry(max_retries=30, delay=2):
     """Create database tables with retry logic"""
@@ -40,4 +42,14 @@ def create_tables_with_retry(max_retries=30, delay=2):
 
 if __name__ == '__main__':
     create_tables_with_retry()
-    app.run(host='0.0.0.0',port=5003)
+    
+    # Register with Consul
+    service_name = os.getenv('SERVICE_NAME', 'microproducts')
+    service_port = int(os.getenv('SERVICE_PORT', 5003))
+    
+    if register_service_with_consul(service_name, service_port):
+        print(f"Service {service_name} registered with Consul successfully")
+    else:
+        print(f"Failed to register {service_name} with Consul")
+    
+    app.run(host='0.0.0.0', port=service_port)

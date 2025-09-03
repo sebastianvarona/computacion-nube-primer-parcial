@@ -4,3 +4,4 @@ Flask-CORS==4.0.0
 PyMySQL==1.1.0
 requests==2.31.0
 cryptography==41.0.7
+python-consul==1.1.0

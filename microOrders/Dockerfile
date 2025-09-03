@@ -4,9 +4,12 @@ EXPOSE 5004
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY ./microOrders/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . .
+# Copy shared utilities first
+COPY ./shared /app/shared
+
+COPY ./microOrders .
 
 CMD ["python", "run.py"]

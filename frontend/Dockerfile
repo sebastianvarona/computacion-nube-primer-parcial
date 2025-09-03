@@ -4,9 +4,12 @@ EXPOSE 5001
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY ./frontend/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . .
+# Copy shared utilities first
+COPY ./shared /app/shared
+
+COPY ./frontend .
 
 CMD ["python", "run.py"]

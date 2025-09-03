@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  consul:
+    image: consul:1.15.3
+    container_name: consul-server
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    command: >
+      consul agent -server -ui -node=server-1 -bootstrap-expect=1
+      -client=0.0.0.0 -bind=0.0.0.0 -data-dir=/consul/data
+    volumes:
+      - consul_data:/consul/data
+    networks:
+      - microservices-network
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   db:
     image: mysql:8.0
     container_name: mysql-db
@@ -21,26 +40,36 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./frontend/Dockerfile
     container_name: frontend-service
     ports:
       - "5001:5001"
     depends_on:
-      - microusers
-      - microproducts
-      - microorders
+      consul:
+        condition: service_healthy
+      microusers:
+        condition: service_started
+      microproducts:
+        condition: service_started
+      microorders:
+        condition: service_started
+    environment:
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
     networks:
       - microservices-network
 
   microusers:
     build:
-      context: ./microUsers
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./microUsers/Dockerfile
     container_name: microusers-service
     ports:
       - "5002:5002"
     depends_on:
+      consul:
+        condition: service_healthy
       db:
         condition: service_healthy
     environment:
@@ -49,17 +78,23 @@ services:
       - DB_USER=root
       - DB_PASSWORD=root
       - DB_NAME=microservices_db
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=microusers
+      - SERVICE_PORT=5002
     networks:
       - microservices-network
 
   microproducts:
     build:
-      context: ./microProducts
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./microProducts/Dockerfile
     container_name: microproducts-service
     ports:
       - "5003:5003"
     depends_on:
+      consul:
+        condition: service_healthy
       db:
         condition: service_healthy
     environment:
@@ -68,17 +103,23 @@ services:
       - DB_USER=root
       - DB_PASSWORD=root
       - DB_NAME=microservices_db
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=microproducts
+      - SERVICE_PORT=5003
     networks:
       - microservices-network
 
   microorders:
     build:
-      context: ./microOrders
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./microOrders/Dockerfile
     container_name: microorders-service
     ports:
       - "5004:5004"
     depends_on:
+      consul:
+        condition: service_healthy
       db:
         condition: service_healthy
       microproducts:
@@ -89,11 +130,16 @@ services:
       - DB_USER=root
       - DB_PASSWORD=root
       - DB_NAME=microservices_db
+      - CONSUL_HOST=consul
+      - CONSUL_PORT=8500
+      - SERVICE_NAME=microorders
+      - SERVICE_PORT=5004
     networks:
       - microservices-network
 
 volumes:
   mysql_data:
+  consul_data:
 
 networks:
   microservices-network:

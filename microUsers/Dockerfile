@@ -4,9 +4,12 @@ EXPOSE 5002
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY ./microUsers/requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . .
+# Copy shared utilities first
+COPY ./shared /app/shared
+
+COPY ./microUsers .
 
 CMD ["python", "run.py"]
