@@ -1,0 +1,16 @@
+ * Serving Flask app 'run.py'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://10.0.2.15:5002
+Press CTRL+C to quit
+192.168.80.1 - - [03/Sep/2025 00:57:10] "GET / HTTP/1.1" 404 -
+192.168.80.1 - - [03/Sep/2025 00:57:10] "GET /favicon.ico HTTP/1.1" 404 -
+192.168.80.1 - - [03/Sep/2025 00:57:48] "GET / HTTP/1.1" 404 -
+127.0.0.1 - - [03/Sep/2025 00:58:57] "GET / HTTP/1.1" 404 -
+192.168.80.1 - - [03/Sep/2025 01:00:27] "OPTIONS /api/login HTTP/1.1" 200 -
+192.168.80.1 - - [03/Sep/2025 01:00:27] "POST /api/login HTTP/1.1" 200 -
+192.168.80.1 - - [03/Sep/2025 01:00:32] "OPTIONS /api/users HTTP/1.1" 200 -
+192.168.80.1 - - [03/Sep/2025 01:00:32] "GET /api/users HTTP/1.1" 200 -
+192.168.80.1 - - [03/Sep/2025 01:00:34] "GET /api/users HTTP/1.1" 200 -
